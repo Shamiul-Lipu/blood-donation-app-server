@@ -2,6 +2,7 @@ import * as bcrypt from "bcrypt";
 import config from "../../config";
 import prisma from "../../../shared/prisma";
 import { isValidDateFormat } from "../../../shared/isValidDateFormat";
+import { createToken } from "../../../helper/jwtToken";
 
 const registerUser = async (payload: any) => {
   const hashedPassword: string = await bcrypt.hash(
@@ -49,9 +50,37 @@ const registerUser = async (payload: any) => {
 };
 
 const loginUser = async (payload: { email: string; password: string }) => {
-  const result = "login";
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+    },
+  });
 
-  return result;
+  const isPasswordMatched: boolean = await bcrypt.compare(
+    payload.password,
+    userData.password
+  );
+
+  if (!isPasswordMatched) {
+    throw new Error("Password incorrect!");
+  }
+
+  const jwtPayload = {
+    id: userData.id,
+    email: userData.email,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string
+  );
+
+  return {
+    ...jwtPayload,
+    name: userData.name,
+    token: accessToken,
+  };
 };
 
 export const AuthServices = {
