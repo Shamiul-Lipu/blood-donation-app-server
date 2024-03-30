@@ -4,7 +4,7 @@ This application is a TypeScript-based CRUD (Create, Read, Update, Delete) appli
 
 #### Hosted on Vercel
 
-[]
+[https://blood-donation-app-server-kappa.vercel.app/]
 
 ### Prerequisites
 
@@ -127,7 +127,7 @@ If you encounter any issues while running the application, try the following ste
 #### My Server is Hosted on Vercel
 
 You can also access the API from the following link:
-[]
+[https://blood-donation-app-server-kappa.vercel.app/]
 
 ##### API Documentation
 
