@@ -17,6 +17,9 @@ const registerUser = async (payload: any) => {
     }
   }
 
+  const availability =
+    typeof payload.availability === "boolean" ? payload.availability : false;
+
   const result = await prisma.$transaction(async (transactionClient) => {
     const createUser = await transactionClient.user.create({
       data: {
@@ -25,6 +28,7 @@ const registerUser = async (payload: any) => {
         password: hashedPassword,
         bloodType: payload.bloodType,
         location: payload.location,
+        availability: availability,
       },
       include: { userProfile: true },
     });

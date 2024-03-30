@@ -10,12 +10,10 @@ const getAllFromDB = catchAsync(async (req, res) => {
   if (filters.searchTerm || filters.bloodType) {
     // Encode the searchTerm parameter using encodeURIComponent
     filters.searchTerm = encodeURIComponent(filters.searchTerm as any);
-    filters.bloodType = encodeURIComponent(filters.bloodType as any);
     filters.searchTerm = filters.searchTerm.replace(/%20/g, "+");
-    filters.bloodType = filters.bloodType.replace(/%20/g, "+");
   }
 
-  //   console.log(filters);
+  // console.log(filters);
   const result = await BloodDonationServices.getDonorList(filters, options);
 
   res.json({

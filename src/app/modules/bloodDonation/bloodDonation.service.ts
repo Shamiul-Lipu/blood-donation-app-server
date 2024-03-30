@@ -36,7 +36,6 @@ const getDonorList = async (params: any, options: any) => {
     });
   }
 
-  console.log(options.sortBy);
   const whereConditons: Prisma.UserWhereInput = { AND: andCondions };
 
   const result = await prisma.user.findMany({
@@ -82,12 +81,38 @@ const getDonorList = async (params: any, options: any) => {
 };
 
 const requestForBlood = async (user: any, payload: any) => {
-  console.log(user, payload);
+  const donor = await prisma.user.findUnique({
+    where: { id: payload.donorId },
+  });
+
+  // If the donor doesn't exist, throw an error
+  if (!donor) {
+    throw new Error("The specified donor does not exist.");
+  }
+
+  // Check if the availability of the donor is false, throw an error if it is
+  if (!donor.availability) {
+    throw new Error("The specified donor is not available for donation.");
+  }
+
   // checking dateOfDonation date format is ok
   if (payload.dateOfDonation) {
     if (!isValidDateFormat(payload.dateOfDonation)) {
       throw new Error("Invalid date format. Please use the format YYYY-MM-DD.");
     }
+  }
+
+  const existingRequest = await prisma.request.findFirst({
+    where: {
+      donorId: payload.donorId,
+      requesterId: user.id,
+    },
+  });
+
+  if (existingRequest) {
+    throw new Error(
+      "A request with the same donorId and requesterId already exists."
+    );
   }
 
   const result = await prisma.request.create({
@@ -157,6 +182,8 @@ const updateRequestApplicationStatus = async (params: any, data: any) => {
   if (!existingRequest) {
     throw new Error("Request not found.");
   }
+
+  // console.log(data);
 
   const result = await prisma.request.update({
     where: { id: params.requestId },
