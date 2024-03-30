@@ -27,6 +27,48 @@ const getAllFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const requestForBlood = catchAsync(async (req, res) => {
+  const result = await BloodDonationServices.requestForBlood(
+    req.user,
+    req.body
+  );
+
+  res.json({
+    success: true,
+    statusCode: 201,
+    message: "Request successfully made",
+    data: result,
+  });
+});
+
+const getDonationRequests = catchAsync(async (req, res) => {
+  const result = await BloodDonationServices.getDonationRequests(req.user);
+
+  res.json({
+    success: true,
+    statusCode: 200,
+    message: "Donation requests retrieved successfully",
+    data: result,
+  });
+});
+
+const updateRequestApplicationStatus = catchAsync(async (req, res) => {
+  const result = await BloodDonationServices.updateRequestApplicationStatus(
+    req.params,
+    req.body
+  );
+
+  res.json({
+    success: true,
+    statusCode: 200,
+    message: "Donation request status successfully updated",
+    data: result,
+  });
+});
+
 export const BloodDonationControllers = {
   getAllFromDB,
+  requestForBlood,
+  getDonationRequests,
+  updateRequestApplicationStatus,
 };

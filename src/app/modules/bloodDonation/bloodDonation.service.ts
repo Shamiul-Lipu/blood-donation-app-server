@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { searchAbleFields } from "./bloodDonation.constant";
 import prisma from "../../../shared/prisma";
+import { isValidDateFormat } from "../../../shared/isValidDateFormat";
 
 const getDonorList = async (params: any, options: any) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
@@ -20,7 +21,7 @@ const getDonorList = async (params: any, options: any) => {
     });
   }
 
-  console.log(filterData);
+  //   console.log(filterData);
 
   if (Object.keys(filterData).length > 0) {
     andCondions.push({
@@ -80,6 +81,94 @@ const getDonorList = async (params: any, options: any) => {
   };
 };
 
+const requestForBlood = async (user: any, payload: any) => {
+  console.log(user, payload);
+  // checking dateOfDonation date format is ok
+  if (payload.dateOfDonation) {
+    if (!isValidDateFormat(payload.dateOfDonation)) {
+      throw new Error("Invalid date format. Please use the format YYYY-MM-DD.");
+    }
+  }
+
+  const result = await prisma.request.create({
+    data: {
+      donorId: payload.donorId,
+      requesterId: user.id,
+      phoneNumber: payload.phoneNumber,
+      dateOfDonation: payload.dateOfDonation,
+      hospitalName: payload.hospitalName,
+      hospitalAddress: payload.hospitalAddress,
+      reason: payload.reason,
+    },
+    include: {
+      donor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          bloodType: true,
+          location: true,
+          availability: true,
+          createdAt: true,
+          updatedAt: true,
+          userProfile: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const getDonationRequests = async (user: any) => {
+  const result = prisma.request.findMany({
+    where: {
+      donorId: user.id,
+    },
+    include: {
+      requester: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          location: true,
+          bloodType: true,
+          availability: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const updateRequestApplicationStatus = async (params: any, data: any) => {
+  // Check if the requestId is provided
+  if (!params.requestId) {
+    throw new Error("Request ID is required.");
+  }
+
+  // Check if the request with the provided ID exists
+  const existingRequest = await prisma.request.findUnique({
+    where: { id: params.requestId },
+  });
+
+  // If the request does not exist, throw an error
+  if (!existingRequest) {
+    throw new Error("Request not found.");
+  }
+
+  const result = await prisma.request.update({
+    where: { id: params.requestId },
+    data: { requestStatus: data.status },
+  });
+
+  return result;
+};
+
 export const BloodDonationServices = {
   getDonorList,
+  requestForBlood,
+  getDonationRequests,
+  updateRequestApplicationStatus,
 };
