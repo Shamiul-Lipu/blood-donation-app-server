@@ -14,35 +14,40 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(uuid())
-  name         String
-  email        String       @unique
-  password     String
-  bloodType    String
-  location     String
-  availability Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  userProfile  UserProfile?
+  id                  String       @id @default(uuid())
+  name                String
+  email               String       @unique
+  password            String
+  bloodType           String
+  location            String
+  availability        Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  userProfile         UserProfile?
+  requestsAsDonor     Request[]    @relation("RequestsAsDonor")
+  requestsAsRequester Request[]    @relation("RequestsAsRequester")
 
   @@map("user")
 }
 
-// model Request {
-//   id              String        @id @default(uuid())
-//   donorId         String
-//   requesterId     String
-//   phoneNumber     String
-//   dateOfDonation  String
-//   hospitalName    String
-//   hospitalAddress String
-//   reason          String
-//   requestStatus   RequestStatus @default(PENDING)
-//   createdAt       DateTime      @default(now())
-//   updatedAt       DateTime      @updatedAt
+model Request {
+  id              String        @id @default(uuid())
+  donorId         String
+  requesterId     String
+  phoneNumber     String
+  dateOfDonation  String
+  hospitalName    String
+  hospitalAddress String
+  reason          String
+  requestStatus   RequestStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-//   @@map("request")
-// }
+  donor     User @relation("RequestsAsDonor", fields: [donorId], references: [id])
+  requester User @relation("RequestsAsRequester", fields: [requesterId], references: [id])
+
+  @@map("request")
+}
 
 model UserProfile {
   id               String   @id @default(uuid())
