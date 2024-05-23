@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "RequestStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -9,7 +12,10 @@ CREATE TABLE "user" (
     "password" TEXT NOT NULL,
     "bloodType" TEXT NOT NULL,
     "location" TEXT NOT NULL,
-    "availability" BOOLEAN NOT NULL DEFAULT false,
+    "division" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "availability" BOOLEAN NOT NULL,
+    "role" "UserRole" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

@@ -6,7 +6,7 @@ import { updateRequestApplicationStatusValidator } from "./bloodDonation.validat
 
 const router = express.Router();
 
-router.get("/donor-list", auth(), BloodDonationControllers.getAllFromDB);
+router.get("/donor-list", BloodDonationControllers.getAllFromDB);
 
 router.post(
   "/donation-request",

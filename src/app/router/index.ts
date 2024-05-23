@@ -6,9 +6,9 @@ import { BloodDonationRoutes } from "../modules/bloodDonation/bloodDonation.rout
 const router = Router();
 
 const moduleRoutes = [
-  { path: "/api", route: AuthRoutes },
-  { path: "/api", route: UserRoutes },
-  { path: "/api", route: BloodDonationRoutes },
+  { path: "/auth", route: AuthRoutes },
+  { path: "/user", route: UserRoutes },
+  { path: "/blood-donation", route: BloodDonationRoutes },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
