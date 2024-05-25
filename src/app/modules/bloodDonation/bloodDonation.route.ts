@@ -3,14 +3,21 @@ import auth from "../../middleware/auth";
 import { BloodDonationControllers } from "./bloodDonation.controller";
 import validateRequest from "../../middleware/validateRequest";
 import { updateRequestApplicationStatusValidator } from "./bloodDonation.validation";
+import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
 router.get("/donor-list", BloodDonationControllers.getAllFromDB);
 
+router.get(
+  "/donor-details/:id",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
+  BloodDonationControllers.getDonorDetails
+);
+
 router.post(
   "/donation-request",
-  auth(),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   BloodDonationControllers.requestForBlood
 );
 

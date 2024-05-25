@@ -21,20 +21,49 @@ const getDonorList = async (params: any, options: any) => {
     });
   }
 
-  //   console.log(filterData);
+  // console.log({ filterData });
+
+  // if (Object.keys(filterData).length > 0) {
+  //   andCondions.push({
+  //     OR: Object.keys(filterData).map((key) => ({
+  //       [key]: {
+  //         equals:
+  //           key === "availability"
+  //             ? filterData[key] === "true"
+  //             : filterData[key],
+  //       },
+  //     })),
+  //   });
+  // }
 
   if (Object.keys(filterData).length > 0) {
-    andCondions.push({
-      OR: Object.keys(filterData).map((key) => ({
-        [key]: {
-          equals:
-            key === "availability"
-              ? filterData[key] === "true"
-              : filterData[key],
-        },
-      })),
+    Object.keys(filterData).forEach((key) => {
+      if (key === "availability" || key === "bloodType" || key === "location") {
+        andCondions.push({
+          OR: [
+            {
+              [key]: {
+                equals:
+                  key === "availability"
+                    ? filterData[key] === "true"
+                    : filterData[key],
+              },
+            },
+          ],
+        });
+      } else {
+        andCondions.push({
+          [key]: {
+            equals: filterData[key],
+          },
+        });
+      }
     });
   }
+
+  andCondions.push({
+    isAccountActive: true,
+  });
 
   const whereConditons: Prisma.UserWhereInput = { AND: andCondions };
 
@@ -47,6 +76,12 @@ const getDonorList = async (params: any, options: any) => {
       bloodType: true,
       location: true,
       availability: true,
+      address: true,
+      requestsAsDonor: true,
+      requestsAsRequester: true,
+      gender: true,
+      division: true,
+      profileImage: true,
       createdAt: true,
       password: false,
       updatedAt: true,
@@ -115,13 +150,31 @@ const requestForBlood = async (user: any, payload: any) => {
     );
   }
 
+  const requester = await prisma.user.findUniqueOrThrow({
+    where: { id: user.id },
+    include: {
+      userProfile: {
+        select: { age: true, phoneNumber: true, lastDonationDate: true },
+      },
+    },
+  });
+
   const result = await prisma.request.create({
     data: {
       donorId: payload.donorId,
       requesterId: user.id,
-      phoneNumber: payload.phoneNumber,
-      dateOfDonation: payload.dateOfDonation,
+      requesterName: requester.name,
+      requesterEmail: requester.email,
+      requesterAge: requester.userProfile?.age as number,
+      requesterPhoneNumber: requester.userProfile?.phoneNumber as string,
+      requesterLastDonationDate: requester.userProfile
+        ?.lastDonationDate as string,
+      requesterLocation: requester.location,
+      requesterDivision: requester.division,
+      requesterAddress: requester.address,
+      isTermsAgreed: payload.isTermsAgreed,
       hospitalName: payload.hospitalName,
+      dateOfDonation: payload.dateOfDonation,
       hospitalAddress: payload.hospitalAddress,
       reason: payload.reason,
     },
@@ -193,9 +246,38 @@ const updateRequestApplicationStatus = async (params: any, data: any) => {
   return result;
 };
 
+const getDonorDetails = async (id: string) => {
+  const result = await prisma.user.findFirstOrThrow({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bloodType: true,
+      location: true,
+      availability: true,
+      address: true,
+      requestsAsDonor: true,
+      requestsAsRequester: true,
+      gender: true,
+      division: true,
+      profileImage: true,
+      createdAt: true,
+      password: false,
+      updatedAt: true,
+      userProfile: true,
+    },
+  });
+
+  return result;
+};
+
 export const BloodDonationServices = {
   getDonorList,
   requestForBlood,
   getDonationRequests,
   updateRequestApplicationStatus,
+  getDonorDetails,
 };

@@ -21,12 +21,15 @@ const registerUser = async (payload: any) => {
   const availability =
     typeof payload.availability === "boolean" ? payload.availability : false;
 
+  // console.log(payload);
   const result = await prisma.$transaction(async (transactionClient) => {
     const createUser = await transactionClient.user.create({
       data: {
         name: payload.name,
         email: payload.email,
         password: hashedPassword,
+        gender: payload.gender,
+        profileImage: payload.profileImage,
         bloodType: payload.bloodType,
         role: UserRole.USER,
         location: payload.location,
@@ -41,6 +44,7 @@ const registerUser = async (payload: any) => {
       data: {
         bio: payload.bio,
         age: payload.age,
+        phoneNumber: payload.phoneNumber,
         lastDonationDate: payload.lastDonationDate,
         userId: createUser.id,
       },
@@ -61,6 +65,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
+      isAccountActive: true,
     },
   });
 

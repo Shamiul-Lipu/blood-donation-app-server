@@ -13,7 +13,6 @@ const getAllFromDB = catchAsync(async (req, res) => {
     filters.searchTerm = filters.searchTerm.replace(/%20/g, "+");
   }
 
-  // console.log(filters);
   const result = await BloodDonationServices.getDonorList(filters, options);
 
   res.json({
@@ -64,9 +63,22 @@ const updateRequestApplicationStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getDonorDetails = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await BloodDonationServices.getDonorDetails(id);
+
+  res.json({
+    success: true,
+    statusCode: 200,
+    message: "Donor Details retrived successfully",
+    data: result,
+  });
+});
+
 export const BloodDonationControllers = {
   getAllFromDB,
   requestForBlood,
   getDonationRequests,
   updateRequestApplicationStatus,
+  getDonorDetails,
 };

@@ -6,7 +6,7 @@ import notFoundError from "./app/middleware/notFoundError";
 import cookieParser from "cookie-parser";
 
 const app: Application = express();
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 //parser
 app.use(cookieParser());

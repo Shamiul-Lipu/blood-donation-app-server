@@ -1,3 +1,15 @@
-export const searchAbleFields = ["bloodType", "location", "name", "email"];
+export const searchAbleFields = [
+  "bloodType",
+  "location",
+  "name",
+  "email",
+  "division",
+];
 
-export const filtarableFields = ["searchTerm", "availability", "bloodType"];
+export const filtarableFields = [
+  "searchTerm",
+  "availability",
+  "bloodType",
+  "location",
+  "division",
+];
