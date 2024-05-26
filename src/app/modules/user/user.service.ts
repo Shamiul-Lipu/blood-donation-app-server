@@ -16,15 +16,25 @@ const getMyProfile = async (payload: any) => {
 };
 
 const updateMyProfile = async (user: any, data: any) => {
-  await prisma.userProfile.findUniqueOrThrow({
-    where: { userId: user.id },
+  await prisma.user.findUniqueOrThrow({
+    where: { id: user.id },
   });
 
-  const result = await prisma.userProfile.update({
+  const result = await prisma.user.update({
     where: {
-      userId: user.id,
+      id: user.id,
     },
-    data,
+    data: {
+      ...data,
+      userProfile: data.userProfile
+        ? {
+            update: {
+              ...data.userProfile,
+            },
+          }
+        : undefined,
+    },
+    include: { userProfile: true },
   });
 
   return result;

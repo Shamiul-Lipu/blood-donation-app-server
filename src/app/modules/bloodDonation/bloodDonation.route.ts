@@ -9,11 +9,7 @@ const router = express.Router();
 
 router.get("/donor-list", BloodDonationControllers.getAllFromDB);
 
-router.get(
-  "/donor-details/:id",
-  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
-  BloodDonationControllers.getDonorDetails
-);
+router.get("/donor-details/:id", BloodDonationControllers.getDonorDetails);
 
 router.post(
   "/donation-request",

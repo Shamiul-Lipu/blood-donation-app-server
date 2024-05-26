@@ -116,6 +116,7 @@ const getDonorList = async (params: any, options: any) => {
 };
 
 const requestForBlood = async (user: any, payload: any) => {
+  // console.log(payload);
   const donor = await prisma.user.findUnique({
     where: { id: payload.donorId },
   });
