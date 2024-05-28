@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Assuming your Prisma enum is defined as an object
 const prismaEnumValues = {
   PENDING: "PENDING",
   APPROVED: "APPROVED",

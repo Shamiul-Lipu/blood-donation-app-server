@@ -51,6 +51,7 @@ const getDonationRequests = catchAsync(async (req, res) => {
 
 const updateRequestApplicationStatus = catchAsync(async (req, res) => {
   const result = await BloodDonationServices.updateRequestApplicationStatus(
+    req.user,
     req.params,
     req.body
   );

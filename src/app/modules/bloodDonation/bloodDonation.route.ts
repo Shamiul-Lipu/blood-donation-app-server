@@ -19,13 +19,13 @@ router.post(
 
 router.get(
   "/donation-request",
-  auth(),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   BloodDonationControllers.getDonationRequests
 );
 
 router.put(
   "/donation-request/:requestId",
-  auth(),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   validateRequest(updateRequestApplicationStatusValidator),
   BloodDonationControllers.updateRequestApplicationStatus
 );

@@ -135,8 +135,47 @@ const refreshToken = async (token: any) => {
   };
 };
 
+const changePassword = async (user: any, payload: any) => {
+  const { currentPassword, newPassword } = payload;
+
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      id: user?.id,
+      isAccountActive: true,
+    },
+  });
+
+  if (!isUserExist) {
+    throw new Error("User does not exist!");
+  }
+
+  const isPasswordMatched = await bcrypt.compare(
+    currentPassword,
+    isUserExist.password
+  );
+
+  if (isUserExist.password && !isPasswordMatched) {
+    throw new Error("Old Password is incorrect");
+  }
+
+  const hashedPassword: string = await bcrypt.hash(
+    newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  await prisma.user.update({
+    where: {
+      id: isUserExist.id,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+};
+
 export const AuthServices = {
   registerUser,
   loginUser,
   refreshToken,
+  changePassword,
 };

@@ -200,28 +200,55 @@ const requestForBlood = async (user: any, payload: any) => {
 };
 
 const getDonationRequests = async (user: any) => {
-  const result = prisma.request.findMany({
+  const requestByMe = await prisma.request.findMany({
     where: {
-      donorId: user.id,
+      requesterId: user.id,
     },
-    include: {
-      requester: {
+    select: {
+      requestStatus: true,
+      donor: {
         select: {
-          id: true,
-          name: true,
-          email: true,
-          location: true,
           bloodType: true,
           availability: true,
+          name: true,
+          division: true,
+          location: true,
+          address: true,
+          userProfile: true,
         },
       },
     },
   });
 
-  return result;
+  const requestToMe = await prisma.request.findMany({
+    where: {
+      donorId: user.id,
+    },
+    select: {
+      id: true,
+      requestStatus: true,
+      requesterPhoneNumber: true,
+      requesterName: true,
+      requesterEmail: true,
+      requesterLocation: true,
+      requesterDivision: true,
+      requesterAddress: true,
+      requester: {
+        select: {
+          bloodType: true,
+        },
+      },
+    },
+  });
+  // console.log(requestByMe, requestToMe);
+  return { requestByMe, requestToMe };
 };
 
-const updateRequestApplicationStatus = async (params: any, data: any) => {
+const updateRequestApplicationStatus = async (
+  user: any,
+  params: any,
+  data: any
+) => {
   // Check if the requestId is provided
   if (!params.requestId) {
     throw new Error("Request ID is required.");
@@ -237,10 +264,15 @@ const updateRequestApplicationStatus = async (params: any, data: any) => {
     throw new Error("Request not found.");
   }
 
-  // console.log(data);
+  // console.log(user.id, existingRequest);
+  if (user.id === existingRequest.requesterId) {
+    throw new Error(
+      "You are requester here, unauthorized to update status of this request"
+    );
+  }
 
   const result = await prisma.request.update({
-    where: { id: params.requestId },
+    where: { id: params.requestId, donorId: user.id },
     data: { requestStatus: data.status },
   });
 
