@@ -6,7 +6,15 @@ import notFoundError from "./app/middleware/notFoundError";
 import cookieParser from "cookie-parser";
 
 const app: Application = express();
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  })
+);
+// origin: "https://donate-and-save-psi.vercel.app",
+// origin: "http://localhost:3000",
 
 //parser
 app.use(cookieParser());
@@ -16,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 // aplication routes
 app.use("/api/v1", router);
 
-app.get("/api/v1/test", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.json({
     success: true,
     message: "Blood Donation Application Server...",
