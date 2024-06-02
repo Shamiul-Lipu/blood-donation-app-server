@@ -8,13 +8,26 @@ import cookieParser from "cookie-parser";
 const app: Application = express();
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://donate-and-save-psi.vercel.app",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
+    // optionsSuccessStatus: 200,
   })
 );
 // origin: "https://donate-and-save-psi.vercel.app",
 // origin: "http://localhost:3000",
+
+// app.options(
+//   "*",
+//   cors({
+//     origin: "https://donate-and-save-psi.vercel.app",
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     optionsSuccessStatus: 200,
+//   })
+// );
 
 //parser
 app.use(cookieParser());
